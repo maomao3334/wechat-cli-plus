@@ -1,382 +1,232 @@
 <div align="center">
 
-# WeChat CLI
+# WeChat CLI Plus
 
-**Query your local WeChat data from the command line.**
+**WeChat CLI 增强版 - 支持微信 4.1+ 版本**
 
-[![npm version](https://img.shields.io/npm/v/@canghe_ai/wechat-cli.svg)](https://www.npmjs.com/package/@canghe_ai/wechat-cli)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/freestylefly/wechat-cli)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/maomao3334/wechat-cli-plus)
+[![WeChat](https://img.shields.io/badge/WeChat-4.1.13+-green.svg)](https://github.com/maomao3334/wechat-cli-plus)
 
-Chat history · Contacts · Sessions · Favorites · Statistics · Export
+命令行查询本地微信数据 · 支持最新版微信 · 增强密钥提取
 
-[中文文档](README_CN.md)
+[English](README_EN.md) | 中文文档
 
 </div>
 
 ---
 
-## ✨ Highlights
+## 🎯 关于本项目
 
-- **🚀 Zero-config install** — `npm install -g` and you're done, no Python needed
-- **📦 11 commands** — sessions, history, search, contacts, members, stats, export, favorites, unread, new-messages, init
-- **🤖 AI-first** — JSON output by default, designed for LLM agent tool calls
-- **🔒 Fully local** — on-the-fly SQLCipher decryption, data never leaves your machine
-- **📊 Rich analytics** — top senders, message type breakdown, 24-hour activity charts
-- **📝 Flexible export** — Markdown or plain text, with time range filtering
+这是 [wechat-cli](https://github.com/huohuoer/wechat-cli) 的维护分支，专门适配**微信 4.1+ 版本**。
+
+### 🆕 相比原版的改进
+
+- ✅ **支持微信 4.1.13+** - 使用 Config.Cipher 运行时扫描技术
+- ⚡ **提取速度更快** - 8-10 秒完成所有密钥提取（原版需数分钟）
+- 🎯 **准确率更高** - 基于 [wcdb-key-tool](https://github.com/ppwwyyxx/wechat-dump) 的成熟实现
+- 🔒 **保持兼容** - 同时支持新旧版本微信
+
+### 📦 版本支持
+
+| 微信版本 | 提取方法 | 支持状态 |
+|---------|---------|---------|
+| 3.9.x 及更早 | 传统内存扫描 | ✅ 支持 |
+| 4.0.x - 4.1.x | Config.Cipher 扫描 | ✅ 支持 |
+| 4.1.13+ | Config.Cipher 扫描 | ✅ 已测试 |
 
 ---
 
-## 📥 Installation (For Humans)
+## ✨ 核心特性
 
-AI Agents — skip ahead to "Installation (For AI Agents)" below.
+- **🚀 零配置安装** — `pip install` 即用，无需额外依赖
+- **📦 11 个命令** — sessions、history、search、contacts、members、stats、export、favorites、unread、new-messages、init
+- **🤖 AI 优先** — 默认 JSON 输出，为 LLM agent 工具调用设计
+- **🔒 完全本地** — 实时 SQLCipher 解密，数据不离开本机
+- **📊 丰富分析** — 消息统计、活跃时段、成员排名
+- **📝 灵活导出** — Markdown 或纯文本，支持时间范围过滤
 
-### npm (Recommended)
+---
+
+## 📥 安装
+
+### pip（推荐）
 
 ```bash
-npm install -g @canghe_ai/wechat-cli
+pip install git+https://github.com/maomao3334/wechat-cli-plus.git
 ```
 
-> Currently ships a **macOS arm64** binary. Other platforms can use the pip method below. PRs with additional platform binaries are welcome.
+需要 Python >= 3.10。
 
-**Update to the latest version:**
-
-```bash
-npm update -g @canghe_ai/wechat-cli
-```
-
-### pip
+### 从源码安装
 
 ```bash
-pip install wechat-cli
-```
-
-Requires Python >= 3.10.
-
-### From Source
-
-```bash
-git clone https://github.com/freestylefly/wechat-cli.git
-cd wechat-cli
+git clone https://github.com/maomao3334/wechat-cli-plus.git
+cd wechat-cli-plus
 pip install -e .
 ```
 
 ---
 
-## 📥 Installation (For AI Agents)
+## 🚀 快速开始
 
-Simply paste the following prompt into Claude Code, OpenClaw, or any AI coding agent:
+### 第 1 步 — 初始化
 
-```bash
-帮我配置并安装：npm install -g @canghe_ai/wechat-cli
-```
-
-For example, in Claude Code:
-
-![install-claude-code-1](image/install-claude-code-1.png)
-
-Note: Make sure you have Node.js installed first. You can ask your agent to set it up if needed.
-
----
-
-## 🚀 Quick Start
-
-### Step 1 — Initialize
-
-Make sure WeChat is running, then:
+确保微信正在运行，然后：
 
 ```bash
-# macOS/Linux: may need sudo for memory scanning
-sudo wechat-cli init
-
-# Windows: run in a terminal with sufficient privileges
+# Windows: 以管理员权限运行
 wechat-cli init
+
+# macOS/Linux: 需要 sudo 权限扫描内存
+sudo wechat-cli init
 ```
 
-This auto-detects your WeChat data directory, extracts encryption keys, and saves config to `~/.wechat-cli/`.
+自动检测微信数据目录、提取加密密钥，配置保存到 `~/.wechat-cli/`。
 
-![init-claude-code-1](image/init-claude-code-1.png)
-
-On macOS, you'll need to run the `sudo` command and enter your password:
-
-![init-claude-code-2](image/init-claude-code-2.png)
-
-If you have multiple WeChat accounts logged in locally, you'll be prompted to choose one. Select the account you're currently using (the default is the first one):
-
-![init-claude-code-3](image/init-claude-code-3.png)
-
-If you're unsure which WeChat account is currently active, navigate to the data folder and sort by modification date to find out:
-
-![init-claude-code-4](image/init-claude-code-4.png)
-
-#### macOS: Grant Full Disk Access to Terminal
-
-Before running `init`, make sure your terminal app has **Full Disk Access**:
-
-1. Open **System Settings → Privacy & Security → Full Disk Access**
-2. Add your terminal app (e.g. Terminal, iTerm2, or the terminal in your IDE)
-3. Restart the terminal after enabling
-
-Without this permission, the tool cannot access WeChat's data directory and key extraction will fail.
-
-#### macOS: `task_for_pid failed` Error
-
-On some macOS systems, `init` may fail with `task_for_pid failed` even when running with `sudo`. This is due to macOS security restrictions on process memory access.
-
-**WeChat CLI will automatically attempt to fix this** by re-signing WeChat with the required entitlement (original entitlements are preserved). Just follow the on-screen instructions:
-
-1. The tool will re-sign WeChat automatically
-2. Quit WeChat completely (not just minimize)
-3. Reopen WeChat and log in
-4. Run `sudo wechat-cli init` again
-
-If auto re-signing fails, you can do it manually:
-
-```bash
-# Quit WeChat first, then:
-sudo codesign --force --sign - --entitlements /dev/stdin /Applications/WeChat.app <<'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>com.apple.security.get-task-allow</key>
-    <true/>
-</dict>
-</plist>
-EOF
+**测试结果示例（Windows 微信 4.1.13）：**
+```
+找到 24 个数据库, 24 个不同的 salt
+[+] Weixin.exe PID=27100 (890MB)
+[*] Config.Cipher 扫描: 找到 1 个名称匹配
+[+] Config.Cipher 扫描匹配 24/24 salts (候选=31)
+扫描完成: 8.6s
 ```
 
-> **Heads up:** Re-signing WeChat is safe and will **not** cause account issues or bans. However, it may affect WeChat's auto-update mechanism. If you notice any feature not working properly, or want to update WeChat to the latest version, simply re-download and reinstall WeChat from the [official website](https://mac.weixin.qq.com/) — no need to re-run `init`, your existing config and keys will continue to work.
+#### Windows 注意事项
 
-### Step 2 — Use It
+- 需要管理员权限扫描 Weixin.exe 进程内存
+- 确保微信正在运行
+- 如遇权限问题，右键"以管理员身份运行"命令行
+
+#### macOS 注意事项
+
+详见原版文档中的"macOS: Grant Full Disk Access to Terminal"和"macOS: task_for_pid failed Error"部分。
+
+### 第 2 步 — 使用
 
 ```bash
-wechat-cli sessions                        # Recent chats
-wechat-cli history "Alice" --limit 20      # Chat messages
-wechat-cli search "deadline" --chat "Team" # Search messages
+wechat-cli sessions                        # 最近会话
+wechat-cli history "Alice" --limit 20      # 聊天记录
+wechat-cli search "deadline" --chat "Team" # 搜索消息
 ```
 
 ---
 
-## 🤖 Using with AI Agents
+## 🤖 与 AI Agent 集成
 
-WeChat CLI is designed as an AI agent tool. All commands output structured JSON by default.
+WeChat CLI Plus 是为 AI agent 工具调用设计的，所有命令默认输出结构化 JSON。
 
 ### Claude Code
 
-Add to your project's `CLAUDE.md`:
+在项目的 `CLAUDE.md` 中添加：
 
 ```markdown
 ## WeChat CLI
 
-You can use `wechat-cli` to query my local WeChat data.
+你可以使用 `wechat-cli` 查询我的本地微信数据。
 
-Common commands:
-- `wechat-cli sessions --limit 10` — list recent chats
-- `wechat-cli history "NAME" --limit 20 --format text` — read chat history
-- `wechat-cli search "KEYWORD" --chat "CHAT_NAME"` — search messages
-- `wechat-cli contacts --query "NAME"` — search contacts
-- `wechat-cli unread` — show unread sessions
-- `wechat-cli new-messages` — get messages since last check
-- `wechat-cli members "GROUP"` — list group members
-- `wechat-cli stats "CHAT" --format text` — chat statistics
+常用命令：
+- `wechat-cli sessions --limit 10` — 最近会话
+- `wechat-cli history "名字" --limit 20 --format text` — 聊天记录
+- `wechat-cli search "关键词" --chat "聊天名"` — 搜索消息
+- `wechat-cli contacts --query "名字"` — 搜索联系人
+- `wechat-cli unread` — 未读消息
+- `wechat-cli new-messages` — 自上次检查后的新消息
 ```
 
-Then in conversation you can ask Claude things like:
-- "Check my unread WeChat messages"
-- "Search for messages about the project deadline in the Team group"
-- "Who sent the most messages in the AI group this week?"
-
-### OpenClaw / MCP Integration
-
-WeChat CLI works with any AI tool that can execute shell commands:
-
-```bash
-# Get recent conversations
-wechat-cli sessions --limit 5
-
-# Read specific chat
-wechat-cli history "Alice" --limit 30 --format text
-
-# Search with filters
-wechat-cli search "report" --type file --limit 10
-
-# Monitor for new messages (great for cron/automation)
-wechat-cli new-messages --format text
-```
+然后你可以问 Claude：
+- "查看我的微信未读消息"
+- "在团队群里搜索关于项目截止日期的消息"
+- "这周谁在 AI 群里发消息最多？"
 
 ---
 
-## 📖 Command Reference
+## 📖 命令参考
 
-### `sessions` — Recent Chats
+完整命令参考请见原版 README 的"Command Reference"部分。
 
-```bash
-wechat-cli sessions                        # Last 20 sessions
-wechat-cli sessions --limit 10             # Last 10
-wechat-cli sessions --format text          # Human-readable
-```
-
-### `history` — Chat Messages
-
-```bash
-wechat-cli history "Alice"                 # Last 50 messages
-wechat-cli history "Alice" --limit 100 --offset 50
-wechat-cli history "Team" --start-time "2026-04-01" --end-time "2026-04-03"
-wechat-cli history "Alice" --type link     # Only links
-wechat-cli history "Alice" --format text
-```
-
-**Options:** `--limit`, `--offset`, `--start-time`, `--end-time`, `--type`, `--format`
-
-### `search` — Search Messages
-
-```bash
-wechat-cli search "hello"                  # Global search
-wechat-cli search "hello" --chat "Alice"   # In specific chat
-wechat-cli search "meeting" --chat "TeamA" --chat "TeamB"  # Multiple chats
-wechat-cli search "report" --type file     # Only files
-```
-
-**Options:** `--chat` (repeatable), `--start-time`, `--end-time`, `--limit`, `--offset`, `--type`, `--format`
-
-### `contacts` — Contact Search & Details
-
-```bash
-wechat-cli contacts --query "Li"           # Search contacts
-wechat-cli contacts --detail "Alice"       # Contact details
-wechat-cli contacts --detail "wxid_xxx"    # By WeChat ID
-```
-
-Returns: nickname, remark, WeChat ID, bio, avatar URL, account type.
-
-### `members` — Group Members
-
-```bash
-wechat-cli members "Team Group"            # All members (JSON)
-wechat-cli members "Team Group" --format text
-```
-
-### `stats` — Chat Statistics
-
-```bash
-wechat-cli stats "Team Group"
-wechat-cli stats "Alice" --start-time "2026-04-01" --end-time "2026-04-03"
-wechat-cli stats "Team Group" --format text
-```
-
-Returns: total messages, type breakdown, top 10 senders, 24-hour activity distribution.
-
-### `export` — Export Conversations
-
-```bash
-wechat-cli export "Alice" --format markdown              # To stdout
-wechat-cli export "Alice" --format txt --output chat.txt  # To file
-wechat-cli export "Team" --start-time "2026-04-01" --limit 1000
-```
-
-**Options:** `--format markdown|txt`, `--output`, `--start-time`, `--end-time`, `--limit`
-
-### `favorites` — WeChat Bookmarks
-
-```bash
-wechat-cli favorites                       # Recent bookmarks
-wechat-cli favorites --type article        # Articles only
-wechat-cli favorites --query "machine learning"  # Search
-```
-
-**Types:** text, image, article, card, video
-
-### `unread` — Unread Sessions
-
-```bash
-wechat-cli unread                          # All unread sessions
-wechat-cli unread --limit 10 --format text
-```
-
-### `new-messages` — Incremental New Messages
-
-```bash
-wechat-cli new-messages                    # First: return unread + save state
-wechat-cli new-messages                    # Subsequent: only new since last call
-```
-
-State saved at `~/.wechat-cli/last_check.json`. Delete to reset.
+主要命令：
+- `sessions` — 最近会话
+- `history` — 聊天记录
+- `search` — 搜索消息
+- `contacts` — 联系人查询
+- `members` — 群成员列表
+- `stats` — 聊天统计
+- `export` — 导出聊天记录
+- `favorites` — 微信收藏
+- `unread` — 未读会话
+- `new-messages` — 增量新消息
 
 ---
 
-## 🔍 Message Type Filter
+## 🔧 工作原理
 
-The `--type` option (on `history` and `search`):
+微信将聊天数据存储在本地的 SQLCipher 加密 SQLite 数据库中。WeChat CLI Plus：
 
-| Value | Description |
-|-------|-------------|
-| `text` | Text messages |
-| `image` | Images |
-| `voice` | Voice messages |
-| `video` | Videos |
-| `sticker` | Stickers/emojis |
-| `location` | Location shares |
-| `link` | Links and app messages |
-| `file` | File attachments |
-| `call` | Voice/video calls |
-| `system` | System messages |
+1. **提取密钥** — 扫描微信进程内存提取加密密钥（`init`）
+   - **Windows 4.1+**: 使用 Config.Cipher 运行时扫描 + XOR 解码
+   - **旧版本**: 回退到传统十六进制模式匹配
+2. **实时解密** — 透明的页级 AES-256-CBC 解密，带缓存
+3. **本地查询** — 所有数据留在本机，无网络访问
 
----
+### 技术细节（Windows 4.1+）
 
-## 💻 System Requirements
+微信 4.1+ 使用 `com.Tencent.WCDB.Config.Cipher` 结构在运行时存储密钥，并通过 XOR 混淆保护。本工具：
 
-- **macOS** ≥ 26.3.1
-- **WeChat for Mac** ≤ 4.1.8.100
-
-> Older macOS versions or newer WeChat versions may not be compatible.
+1. 在进程内存中搜索 Config.Cipher 字符串
+2. 定位指向该结构的引用
+3. 读取并 XOR 解码密钥 blob
+4. 使用 HMAC-SHA512 验证提取的密钥
 
 ---
 
-## 🖥️ Platform Support
+## 💻 系统要求
 
-| Platform | Status | Notes |
-|----------|--------|-------|
-| macOS (Apple Silicon) | ✅ Supported | Bundled arm64 binary |
-| macOS (Intel) | ✅ Supported | x86_64 binary needed |
-| Windows | ✅ Supported | Reads Weixin.exe process memory |
-| Linux | ✅ Supported | Reads /proc/pid/mem, requires root |
-
----
-
-## 🔧 How It Works
-
-WeChat stores chat data in SQLCipher-encrypted SQLite databases locally. WeChat CLI:
-
-1. **Extracts keys** — scans WeChat process memory for encryption keys (`init`)
-2. **Decrypts on-the-fly** — transparent page-level AES-256-CBC decryption with caching
-3. **Queries locally** — all data stays on your machine, no network access
+| 平台 | 状态 | 备注 |
+|------|------|------|
+| Windows | ✅ 已测试 | 微信 4.1.13.12 @ Windows 11 |
+| macOS | ✅ 应支持 | 未在最新版测试 |
+| Linux | ✅ 应支持 | 需要 root 权限 |
 
 ---
 
-## 📄 License
+## 📄 许可证
 
 [Apache License 2.0](LICENSE)
 
----
-
-## ⚖️ Disclaimer
-
-This project is a local data query tool for personal use only. Please note:
-
-- **Read-only** — this tool only reads locally stored data, it does not send, modify, or delete any messages
-- **No cloud transmission** — all data stays on your local machine, nothing is uploaded to any server
-- **No WeChat ecosystem disruption** — this tool does not interfere with WeChat's normal operation, does not automate any actions, and does not violate WeChat's Terms of Service
-- **Use at your own risk** — this project is for personal learning and research purposes only. Users are responsible for ensuring compliance with local laws and regulations
+继承自原项目 [wechat-cli](https://github.com/huohuoer/wechat-cli)。
 
 ---
 
-## 🙏 Acknowledgements
+## ⚖️ 免责声明
 
-This project is built on top of [wechat-decrypt](https://github.com/ylytdeng/wechat-decrypt), which provides the core WeChat database decryption and data parsing capabilities.
+本项目仅为个人数据查询工具，供个人使用。请注意：
+
+- **只读** — 仅读取本地存储的数据，不发送、修改或删除任何消息
+- **无云端传输** — 所有数据留在本地，不上传到任何服务器
+- **不干扰微信生态** — 不干扰微信正常运行，不自动化任何操作，不违反微信服务条款
+- **风险自负** — 本项目仅供个人学习研究，使用者需确保遵守当地法律法规
 
 ---
 
-## ⭐ Star History
+## 🙏 致谢
 
-[![Star History Chart](https://api.star-history.com/svg?repos=freestylefly/wechat-cli&type=Date)](https://star-history.com/#freestylefly/wechat-cli&Date)
+- 原版项目：[wechat-cli](https://github.com/huohuoer/wechat-cli) by huohuoer
+- 核心解密：[wechat-decrypt](https://github.com/ylytdeng/wechat-decrypt)
+- 密钥提取：[wcdb-key-tool](https://github.com/ppwwyyxx/wechat-dump) 的 Windows 4.1+ 实现
+
+---
+
+## 🔗 相关项目
+
+- [wechat-cli](https://github.com/huohuoer/wechat-cli) - 原版项目（已提交 [PR #22](https://github.com/huohuoer/wechat-cli/pull/22)）
+- [wcdb-key-tool](https://github.com/ppwwyyxx/wechat-dump) - 微信密钥提取工具
+
+---
+
+## 📮 维护者
+
+[@maomao3334](https://github.com/maomao3334)
+
+如有问题或建议，欢迎提 issue。
